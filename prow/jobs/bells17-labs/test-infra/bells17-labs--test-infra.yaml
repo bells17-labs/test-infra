@@ -1,0 +1,36 @@
+presubmits:
+  bells17-labs/test-infra:
+  - name: pull-test-infra-prow-checkconfig
+    decorate: true
+    skip_report: false
+    run_if_changed: '^(prow/(config|plugins).yaml$|prow/jobs/.*.yaml$)'
+    clone_uri: "git@github.com:bells17-labs/test-infra.git"
+    spec:
+      containers:
+      - image: gcr.io/k8s-prow/checkconfig:v20200520-e1124f454
+        command:
+        - /checkconfig
+        args:
+        - --config-path=prow/config.yaml
+        - --job-config-path=prow/jobs
+        - --plugin-config=prow/plugins.yaml
+        - --strict
+        - --warnings=mismatched-tide-lenient
+        - --warnings=tide-strict-branch
+        - --warnings=needs-ok-to-test
+        - --warnings=validate-owners
+        - --warnings=missing-trigger
+        - --warnings=validate-urls
+        - --warnings=unknown-fields
+        bells17-labs/test-infra:
+  - name: hello-world
+    always_run: true
+    decorate: true
+    skip_report: false
+    clone_uri: "git@github.com:bells17-labs/test-infra.git"
+    spec:
+      containers:
+      - image: alpine
+        command: ["/bin/echo"]
+        args:
+          - Hello ProwJob

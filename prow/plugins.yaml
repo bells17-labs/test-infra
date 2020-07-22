@@ -1,0 +1,79 @@
+approve:
+- repos:
+  - bells17-labs
+  require_self_approval: false
+  lgtm_acts_as_approve: true
+
+lgtm:
+- repos:
+  - bells17-labs
+  review_acts_as_lgtm: true
+
+# Lower bounds in number of lines changed; XS is assumed to be zero.
+size:
+  s:   10
+  m:   30
+  l:   100
+  xl:  500
+  xxl: 1000
+
+blunderbuss:
+  request_count: 1
+  max_request_count: 2
+  exclude_approvers: false
+  use_status_availability: true
+
+triggers:
+- repos:
+  - bells17-labs
+  only_org_members: true
+  ignore_ok_to_test: true
+
+label:
+  additional_labels: []
+
+config_updater:
+  maps:
+    prow/label_sync/labels.yaml:
+      name: label-config
+    prow/config.yaml:
+      name: config
+    prow/plugins.yaml:
+      name: plugins
+    prow/jobs/**/*.yaml:
+      name: job-config
+
+retitle:
+  allow_closed_issues: true
+
+external_plugins:
+  bells17-labs:
+  - name: needs-rebase
+    events:
+      - issue_comment
+      - pull_request
+
+plugins:
+  bells17-labs:
+  - approve
+  - assign
+  - blunderbuss
+  - hold
+  - lgtm
+  - size
+  - verify-owners
+  - wip
+  - trigger
+  - owners-label
+  - shrug
+  - cat
+  - dog
+  - goose
+  - pony
+  - yuks
+  - label
+  - lifecycle
+  - retitle
+  - branchcleaner
+  bells17-labs/test-infra:
+  - config-updater

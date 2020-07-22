@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - prowjob.yaml
+  - branchprotector.yaml
+  - crier.yaml
+  - deck.yaml
+  - ghproxy.yaml
+  - hook.yaml
+  - horologium.yaml
+  # - ingress.yaml
+  - loadbalancer.yaml
+  - label-sync.yaml
+  - namespace.yaml
+  - needs-rebase.yml
+  - plank.yaml
+  - sinker.yaml
+  - statusreconciler.yaml
+  - tide.yaml

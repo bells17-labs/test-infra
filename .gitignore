@@ -1,0 +1,6 @@
+/kubeconfig.yaml
+/service-account.json
+/github-token
+/github-oauth-config
+/github-secret
+/github-cookie

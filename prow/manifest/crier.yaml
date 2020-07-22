@@ -1,0 +1,143 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: crier
+  labels:
+    app: crier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crier
+  template:
+    metadata:
+      labels:
+        app: crier
+    spec:
+      serviceAccountName: crier
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: crier
+        image: gcr.io/k8s-prow/crier:v20200520-e1124f454
+        args:
+        - --github-workers=5
+        - --config-path=/etc/config/config.yaml
+        - --job-config-path=/etc/job-config
+        - --github-endpoint=http://ghproxy
+        # - --github-endpoint=https://api.github.com
+        - --github-token-path=/etc/github/oauth
+        # - --slack-workers=1
+        # - --slack-token-file=/etc/slack/token
+        - --gcs-workers=1
+        - --kubernetes-gcs-workers=1
+        - --gcs-credentials-file=/secrets/gcs/service-account.json
+        # - --kubeconfig=/etc/kubeconfig/config
+        volumeMounts:
+        # - mountPath: /etc/kubeconfig
+        #   name: kubeconfig
+        #   readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        # - name: slack
+        #   mountPath: /etc/slack
+        #   readOnly: true
+        - name: gcs-credentials
+          mountPath: /secrets/gcs
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      # - name: slack
+      #   secret:
+      #     secretName: slack-token
+      # - name: kubeconfig
+      #   secret:
+      #     defaultMode: 420
+      #     secretName: kubeconfig
+      - name: gcs-credentials
+        secret:
+          secretName: gcs-credentials
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  annotations:
+    iam.gke.io/gcp-service-account: control-plane@k8s-prow.iam.gserviceaccount.com
+  name: crier
+  namespace: default
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: crier
+rules:
+- apiGroups:
+    - "prow.k8s.io"
+  resources:
+    - "prowjobs"
+  verbs:
+    - "get"
+    - "watch"
+    - "list"
+    - "patch"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: test-pods
+  name: crier
+rules:
+- apiGroups:
+    - ""
+  resources:
+    - "pods"
+    - "events"
+    - "secrets" # TODO
+  verbs:
+    - "get"
+    - "list"
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: crier-namespaced
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: crier
+subjects:
+- kind: ServiceAccount
+  name: crier
+  namespace: default
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: crier-namespaced
+  namespace: test-pods
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: crier
+subjects:
+- kind: ServiceAccount
+  name: crier
+  namespace: default

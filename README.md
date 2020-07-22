@@ -52,6 +52,12 @@ openssl rand -hex 20 > github-secret
 - テスト動作用のGithubのOrganizationの作成
   - 作成したOrganization内にstage-botというチームを作成
   - チームにbotアカウントを招待する
+  - OrganizationのWebhookを設定
+    - Payload URL: `https://<用意したドメイン>/hook`
+    - Content type: `application/json`
+    - Secret: <生成したgithub-secret>
+    - SSL verification: Enable SSL verification
+    - Which events would you like to trigger this webhook?: Send me everything.
 
 - リポジトリの作成
   - 作成したOrganizationにprowを管理するためのtest-infraリポジトリを作成
@@ -109,3 +115,12 @@ make deploy
 
 ロードバランサーIPとドメインの紐付けを行う
 
+### 確認
+
+#### deck
+
+設定したドメインにアクセスして画面が表示されればOK
+
+#### hook
+
+issueの作成などを行い、Webhookが成功しているかを確認する

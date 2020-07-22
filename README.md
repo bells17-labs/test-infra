@@ -84,7 +84,9 @@ kubectl create secret generic oauth-token --from-file=oauth=github-token
 kubectl create secret generic hmac-token --from-file=hmac=github-secret
 kubectl create secret generic github-oauth-config --from-file=secret=github-oauth-config
 kubectl create secret generic cookie --from-file=secret=github-cookie
+kubectl create ns test-pods
 kubectl create secret generic gcs-credentials --from-file=service-account.json
+kubectl create secret generic gcs-credentials --from-file=service-account.json -n test-pods
 ```
 
 ### Config情報の登録

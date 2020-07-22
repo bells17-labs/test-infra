@@ -4,3 +4,5 @@
 /github-oauth-config
 /github-secret
 /github-cookie
+/id_rsa
+/id_rsa.pub

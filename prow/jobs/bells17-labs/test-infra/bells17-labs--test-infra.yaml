@@ -30,6 +30,8 @@ presubmits:
     spec:
       containers:
       - image: gcr.io/k8s-prow/peribolos:v20200722-b942f8218d
+        command:
+        - /app/prow/cmd/peribolos/app.binary.runfiles/io_k8s_test_infra/prow/cmd/peribolos/linux_amd64_pure_stripped/app.binary
         args:
         - --github-token-path=/etc/oauth-token/oauth
         - --config-path=org/org.yaml
@@ -43,7 +45,7 @@ presubmits:
         # - --confirm=true # --confirm=trueをつけないと実行されない
         volumeMounts:
         - name: oauth-token
-          mountPath: /etc/oauth-token/oauth
+          mountPath: /etc/oauth-token
           readOnly: true
       volumes:
       - name: oauth-token
@@ -73,6 +75,8 @@ postsubmits:
     spec:
       containers:
       - image: gcr.io/k8s-prow/peribolos:v20200722-b942f8218d
+        command:
+        - /app/prow/cmd/peribolos/app.binary.runfiles/io_k8s_test_infra/prow/cmd/peribolos/linux_amd64_pure_stripped/app.binary
         args:
         - --github-token-path=/etc/oauth-token/oauth
         - --config-path=org/org.yaml
@@ -83,10 +87,10 @@ postsubmits:
         - --required-admins=bells17
         - --required-admins=necobot
         - --min-admins=2
-        # - --confirm=true # --confirm=trueをつけないと実行されない
+        - --confirm=true # --confirm=trueをつけないと実行されない
         volumeMounts:
         - name: oauth-token
-          mountPath: /etc/oauth-token/oauth
+          mountPath: /etc/oauth-token
           readOnly: true
       volumes:
       - name: oauth-token

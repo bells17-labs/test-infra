@@ -18,10 +18,15 @@ https://github.com/kubernetes/test-infra/blob/master/prow/getting_started_deploy
   - このドメインのためのSSL証明書を用意する
 
 - [Bot用のGithubアカウントを用意する](https://github.com/kubernetes/test-infra/blob/master/prow/getting_started_deploy.md#github-bot-account)
+  - private repositoryでもprowが作れるようにssh keyを登録する
+  ```
+  ssh-keygen -t rsa -b 4096 -f id_rsa
+  ```
   - GithubアカウントのPersonal Access Tokenを生成する
     - 以下の権限を付与する
       - `repo`
       - `admin:org_hook`
+      - `admin:org`
     - Access TokenのSecret用のファイルを生成する
     ```sh
     echo -n "<生成したGithub Token>" > github-token
@@ -87,6 +92,8 @@ kubectl create secret generic cookie --from-file=secret=github-cookie
 kubectl create ns test-pods
 kubectl create secret generic gcs-credentials --from-file=service-account.json
 kubectl create secret generic gcs-credentials --from-file=service-account.json -n test-pods
+kubectl create secret generic ssh-secret --from-file=id_rsa=id_rsa -n test-pods
+kubectl create secret generic oauth-token --from-file=oauth=github-token -n test-pods
 ```
 
 ### Config情報の登録
@@ -126,3 +133,28 @@ make deploy
 #### hook
 
 issueの作成などを行い、Webhookが成功しているかを確認する
+
+## Peribolos
+
+以下のように実行する
+
+```
+docker run -it --rm \
+  -v (pwd)/org.yaml:/Users/<user>/org.yaml \
+  -v (pwd)/../github-token:/Users/<user>/github-token \
+  gcr.io/k8s-prow/peribolos:v20200722-b942f8218d \
+    --github-token-path ~/github-token \
+    --config-path ~/org.yaml \
+    --fix-org \
+    --fix-org-members \
+    --fix-teams \
+    --fix-team-members \
+    --required-admins=bells17 \
+    --required-admins=necobot \
+    --min-admins=2 \
+    ## --confirm=true # --confirm=trueをつけないと実行されない
+```
+
+- https://github.com/kubernetes/test-infra/tree/master/prow/cmd/peribolos
+- https://github.com/kubernetes/org/blob/master/admin/update.sh
+- https://github.com/kubernetes/org/blob/master/admin/BUILD.bazel

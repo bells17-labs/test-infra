@@ -1,0 +1,30 @@
+orgs:
+  bells17-labs:
+    admins:
+    - bells17
+    - necobot
+    billing_email: bells171@gmail.com
+    company: ""
+    default_repository_permission: read
+    description: ""
+    email: ""
+    has_organization_projects: true
+    has_repository_projects: true
+    location: ""
+    members:
+    - bells17-test
+    - dhayakawa-idcf
+    members_can_create_repositories: true
+    name: ""
+    repos:
+      test-infra:
+        has_projects: true
+    teams:
+      stage-bot:
+        description: ""
+        maintainers:
+        - bells17
+        - necobot
+        privacy: closed
+        repos:
+          test-infra: admin

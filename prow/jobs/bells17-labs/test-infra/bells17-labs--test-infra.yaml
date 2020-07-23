@@ -22,7 +22,33 @@ presubmits:
         - --warnings=missing-trigger
         - --warnings=validate-urls
         - --warnings=unknown-fields
-        bells17-labs/test-infra:
+  - name: pre-org-update-check
+    decorate: true
+    skip_report: false
+    run_if_changed: '^org/org.yaml$'
+    clone_uri: "git@github.com:bells17-labs/test-infra.git"
+    spec:
+      containers:
+      - image: gcr.io/k8s-prow/peribolos:v20200722-b942f8218d
+        args:
+        - --github-token-path=oauth-token
+        - --config-path=org/org.yaml
+        - --fix-org
+        - --fix-org-members
+        - --fix-teams
+        - --fix-team-members
+        - --required-admins=bells17
+        - --required-admins=necobot
+        - --min-admins=2
+        # - --confirm=true # --confirm=trueをつけないと実行されない
+        volumeMounts:
+        - name: oauth-token
+          mountPath: /etc/oauth-token/oauth
+          readOnly: true
+      volumes:
+      - name: oauth-token
+        secret:
+          secretName: oauth-token
   - name: hello-world
     always_run: true
     decorate: true
@@ -34,3 +60,35 @@ presubmits:
         command: ["/bin/echo"]
         args:
           - Hello ProwJob
+
+postsubmits:
+  bells17-labs/test-infra:
+  - name: post-org-update-apply
+    branches:
+      - master
+    decorate: true
+    skip_report: false
+    run_if_changed: '^org/org.yaml$'
+    clone_uri: "git@github.com:bells17-labs/test-infra.git"
+    spec:
+      containers:
+      - image: gcr.io/k8s-prow/peribolos:v20200722-b942f8218d
+        args:
+        - --github-token-path=oauth-token
+        - --config-path=org/org.yaml
+        - --fix-org
+        - --fix-org-members
+        - --fix-teams
+        - --fix-team-members
+        - --required-admins=bells17
+        - --required-admins=necobot
+        - --min-admins=2
+        # - --confirm=true # --confirm=trueをつけないと実行されない
+        volumeMounts:
+        - name: oauth-token
+          mountPath: /etc/oauth-token/oauth
+          readOnly: true
+      volumes:
+      - name: oauth-token
+        secret:
+          secretName: oauth-token

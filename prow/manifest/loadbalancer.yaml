@@ -7,24 +7,28 @@ data:
     user nginx;
     worker_processes  3;
     error_log /dev/stderr warn;
+
     events {
       worker_connections  10240;
     }
+
     http {
-      log_format  main
-              'remote_addr:$remote_addr\t'
-              'time_local:$time_local\t'
-              'method:$request_method\t'
-              'uri:$request_uri\t'
-              'host:$host\t'
-              'status:$status\t'
-              'bytes_sent:$body_bytes_sent\t'
-              'referer:$http_referer\t'
-              'useragent:$http_user_agent\t'
-              'forwardedfor:$http_x_forwarded_for\t'
-              'request_time:$request_time';
+      log_format main
+        'remote_addr:$remote_addr\t'
+        'time_local:$time_local\t'
+        'method:$request_method\t'
+        'uri:$request_uri\t'
+        'host:$host\t'
+        'status:$status\t'
+        'bytes_sent:$body_bytes_sent\t'
+        'referer:$http_referer\t'
+        'useragent:$http_user_agent\t'
+        'forwardedfor:$http_x_forwarded_for\t'
+        'request_time:$request_time';
 
       access_log /dev/stdout main;
+
+      limit_req_zone key_all zone=z_all:50m rate=10r/s;
 
       upstream deck {
         server deck.default.svc.cluster.local:80;
@@ -46,6 +50,7 @@ data:
         error_log /dev/stderr warn;
 
         location / {
+          limit_req zone=z_all burst=1000;
           proxy_set_header Host $host;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Host $host;

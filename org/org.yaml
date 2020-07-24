@@ -19,6 +19,8 @@ orgs:
     repos:
       test-infra:
         has_projects: true
+      prow-playground:
+        has_projects: true
     teams:
       stage-bot:
         description: ""
@@ -28,3 +30,4 @@ orgs:
         privacy: closed
         repos:
           test-infra: admin
+          prow-playground: admin

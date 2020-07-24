@@ -1,0 +1,13 @@
+presubmits:
+  bells17-labs/prow-playground:
+  - name: go-test
+    always_run: true
+    decorate: true
+    skip_report: false
+    spec:
+      containers:
+      - image: golang:1.13.8-alpine3.11
+        command: ["go"]
+        args:
+          - test
+          - -v

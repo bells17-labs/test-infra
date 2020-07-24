@@ -39,6 +39,7 @@ presubmits:
         - --fix-org-members
         - --fix-teams
         - --fix-team-members
+        - --fix-repos
         - --required-admins=bells17
         - --required-admins=necobot
         - --min-admins=2
@@ -84,6 +85,7 @@ postsubmits:
         - --fix-org-members
         - --fix-teams
         - --fix-team-members
+        - --fix-repos
         - --required-admins=bells17
         - --required-admins=necobot
         - --min-admins=2
